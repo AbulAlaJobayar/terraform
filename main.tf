@@ -91,22 +91,47 @@
 # }
 
 # Modules
+# provider "aws" {
+#   region = var.aws_region
+# }
+
+# data "aws_ami" "ubuntu" {
+#   most_recent = true
+#   owners      = ["amazon"]
+#   filter {
+#     name   = "name"
+#     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+#   }
+# }
+
+# module "ec2_instance" {
+#   source        = "./ec2_module"
+#   ami_id        = data.aws_ami.ubuntu.id
+#   instance_type = "t3.micro"
+#   instance_name = "my modular ec2 instance"
+#   }
+
+
+# workspace
 provider "aws" {
   region = var.aws_region
 }
 
 data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["amazon"]
+  most_recent  =true
+  owners = ["amazon"]
   filter {
-    name   = "name"
+    name = "name"
     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
   }
 }
 
-module "ec2_instance" {
-  source        = "./ec2_module"
-  ami_id        = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-  instance_name = "my modular ec2 instance"
+resource "aws_instance" "myec2" {
+  ami =data.aws_ami.ubuntu.id
+  instance_type = var.instance_type
+  tags = {
+    Name= "EC2-${terraform.workspace}"
+    Environment=terraform.workspace
   }
+}
+
