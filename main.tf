@@ -35,6 +35,32 @@
 # }
 
 # conditional expression and locals
+# provider "aws" {
+#   region = var.aws_region
+# }
+# data "aws_ami" "ubuntu" {
+#   most_recent = true
+#   owners      = ["amazon"]
+#   filter {
+#     name   = "name"
+#     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+#   }
+# }
+# locals {
+#   name_tag = var.instance_type == "t3.micro" ? "micro instance" : "standard instance"
+# }
+# resource "aws_instance" "my_ec2" {
+#   ami           = data.aws_ami.ubuntu.id
+#   instance_type = var.instance_type
+#   tags = {
+#     Name =local.name_tag
+#   }
+
+# }
+
+
+#  Resource Dependencies & depends_on
+
 provider "aws" {
   region = var.aws_region
 }
@@ -46,6 +72,12 @@ data "aws_ami" "ubuntu" {
     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
   }
 }
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = var.bucket_name
+  tags = {
+    Name = "MyS3Bucket"
+  }
+}
 locals {
   name_tag = var.instance_type == "t3.micro" ? "micro instance" : "standard instance"
 }
@@ -53,7 +85,7 @@ resource "aws_instance" "my_ec2" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
   tags = {
-    Name =local.name_tag
+    Name = local.name_tag
   }
-
+  depends_on = [aws_s3_bucket.my_bucket]
 }
