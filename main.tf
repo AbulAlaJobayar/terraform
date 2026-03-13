@@ -9,23 +9,51 @@
 #     Name = "myFirstEc2"
 #   }
 # }
+
+
+# variables and tags
+
+# provider "aws" {
+#   region = var.aws_region
+# }
+
+# data "aws_ami" "ubuntu" {
+#   most_recent  =true
+#   owners = ["amazon"]
+#   filter {
+#     name = "name"
+#     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+#   }
+# }
+
+# resource "aws_instance" "myec2" {
+#   ami =data.aws_ami.ubuntu.id
+#   instance_type = var.instance_type
+#   tags = {
+#     Name= var.instance_name
+#   }
+# }
+
+# conditional expression and locals
 provider "aws" {
   region = var.aws_region
 }
-
 data "aws_ami" "ubuntu" {
-  most_recent  =true
-  owners = ["amazon"]
+  most_recent = true
+  owners      = ["amazon"]
   filter {
-    name = "name"
+    name   = "name"
     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
   }
 }
-
-resource "aws_instance" "myec2" {
-  ami =data.aws_ami.ubuntu.id
+locals {
+  name_tag = var.instance_type == "t3.micro" ? "micro instance" : "standard instance"
+}
+resource "aws_instance" "my_ec2" {
+  ami           = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
   tags = {
-    Name= var.instance_name
+    Name =local.name_tag
   }
+
 }
